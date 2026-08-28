@@ -1,7 +1,66 @@
 ﻿---
 - hosts: all
   become: true
+
   tasks:
-    - name: check provisioning
-      debug:
-        msg: "jenkins vm ok"
+    - name: mettre a jour le cache apt
+      apt:
+        update_cache: yes
+
+    - name: installer git
+      apt:
+        name: git
+        state: present
+
+    - name: installer docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: demarrer et activer docker
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: ajouter vagrant au groupe docker
+      user:
+        name: vagrant
+        groups: docker
+        append: true
+
+    - name: installer java (requis pour jenkins)
+      apt:
+        name: openjdk-17-jre
+        state: present
+
+    - name: supprimer l'ancienne cle si existante
+      file:
+        path: /usr/share/keyrings/jenkins-keyring.asc
+        state: absent
+
+    - name: telecharger la cle GPG de jenkins directement au bon format
+      get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+
+    - name: ajouter le depot jenkins
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+        filename: jenkins
+
+    - name: installer jenkins
+      apt:
+        update_cache: yes
+        name: jenkins
+        state: present
+
+    - name: demarrer et activer jenkins
+      service:
+        name: jenkins
+        state: started
+        enabled: true
+
+
+

@@ -1,7 +1,53 @@
 ﻿---
 - hosts: all
   become: true
+
   tasks:
-    - name: check provisioning
-      debug:
-        msg: "k8s vm ok"
+    - name: mettre a jour le cache apt
+      apt:
+        update_cache: yes
+
+    - name: installer git
+      apt:
+        name: git
+        state: present
+
+    - name: installer docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: demarrer et activer docker
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: ajouter vagrant au groupe docker
+      user:
+        name: vagrant
+        groups: docker
+        append: true
+
+    - name: telecharger kubectl
+      get_url:
+        url: https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: "0755"
+
+    - name: telecharger minikube
+      get_url:
+        url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        dest: /usr/local/bin/minikube
+        mode: "0755"
+
+    - name: installer postgresql
+      apt:
+        name: postgresql
+        state: present
+
+    - name: demarrer et activer postgresql
+      service:
+        name: postgresql
+        state: started
+        enabled: true

@@ -61,7 +61,7 @@ def index():
               <div class="card-bottom">
                 <div class="avatars">
                   <div class="avatar">H</div>
-                  <div class="avatar"  >R</div>
+                  <div class="avatar">R</div>
                 </div>
                 <div class="date">""" + calendar_icon + " " + task.date + """</div>
               </div>
