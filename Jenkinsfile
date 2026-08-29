@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        PATH = "/var/lib/jenkins/.local/bin:$env.PATH"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
         IMAGE_NAME = "morafikhajar/projet-devops-taches"
     }
@@ -44,5 +45,3 @@ pipeline {
         }
     }
 }
-
-
