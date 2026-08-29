@@ -3,64 +3,43 @@
   become: true
 
   tasks:
-    - name: mettre a jour le cache apt
-      apt:
-        update_cache: yes
-
-    - name: installer git
-      apt:
-        name: git
-        state: present
-
-    - name: installer docker
-      apt:
-        name: docker.io
-        state: present
-
-    - name: demarrer et activer docker
-      service:
-        name: docker
-        state: started
-        enabled: true
-
-    - name: ajouter vagrant au groupe docker
-      user:
-        name: vagrant
-        groups: docker
-        append: true
-
-    - name: installer java (requis pour jenkins)
-      apt:
-        name: openjdk-17-jre
-        state: present
-
-    - name: supprimer l'ancienne cle si existante
+    - name: Nettoyer la configuration de depot Jenkins
       file:
-        path: /usr/share/keyrings/jenkins-keyring.asc
+        path: "{{ item }}"
         state: absent
+      loop:
+        - /etc/apt/sources.list.d/jenkins.list
+        - /etc/apt/sources.list.d/jenkins.list.save
 
-    - name: telecharger la cle GPG de jenkins directement au bon format
-      get_url:
+    - name: Importer la cle GPG Jenkins directement dans apt-key
+      apt_key:
         url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-        dest: /usr/share/keyrings/jenkins-keyring.asc
+        state: present
 
-    - name: ajouter le depot jenkins
+    - name: Ajouter le depot officiel Jenkins
       apt_repository:
-        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        repo: "deb https://pkg.jenkins.io/debian-stable binary/"
         state: present
         filename: jenkins
 
-    - name: installer jenkins
+    - name: Mettre a jour le cache apt
       apt:
         update_cache: yes
+
+    - name: Installer Java 17 et Git
+      apt:
+        name:
+          - openjdk-17-jdk
+          - git
+        state: present
+
+    - name: Installer Jenkins
+      apt:
         name: jenkins
         state: present
 
-    - name: demarrer et activer jenkins
+    - name: Demarrer et activer le service Jenkins
       service:
         name: jenkins
         state: started
         enabled: true
-
-
-
