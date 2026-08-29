@@ -16,7 +16,7 @@ pipeline {
         stage('Tests unitaires') {
             steps {
                 dir('app') {
-                    sh 'pip install -r requirements.txt --break-system-packages'
+                    sh 'pip3 install -r requirements.txt --break-system-packages'
                     sh 'pytest -v'
                 }
             }
@@ -44,3 +44,4 @@ pipeline {
         }
     }
 }
+
