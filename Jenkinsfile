@@ -2,42 +2,44 @@
     agent any
 
     environment {
-        DOCKERHUB_CRED = 'dockerhub-credentials'
-        IMAGE_NAME = 'morafikhajar/todo-app'
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
+        IMAGE_NAME = "morafikhajar/projet-devops-taches"
     }
 
     stages {
         stage('Clone') {
             steps {
-                git branch: 'main', url: 'https://github.com/morafikhajar/Projet-devops.git'
+                checkout scm
             }
         }
 
-        stage('Test') {
+        stage('Tests unitaires') {
             steps {
-                sh 'pip install -r app/requirements.txt -r app/requirements-prod.txt'
-                sh 'pytest app/test_app.py'
-            }
-        }
-
-        stage('Build Docker') {
-            steps {
-                sh 'docker build -t \ ./app'
-            }
-        }
-
-        stage('Push DockerHub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: "\", usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh 'echo \ | docker login -u \ --password-stdin'
-                    sh 'docker push \'
+                dir('app') {
+                    sh 'pip install -r requirements.txt --break-system-packages'
+                    sh 'pytest -v'
                 }
             }
         }
 
-        stage('Deploy K8s') {
+        stage('Build Docker image') {
             steps {
-                sh 'kubectl apply -f k8s/'
+                dir('app') {
+                    sh "docker build -t ${IMAGE_NAME}:latest ."
+                }
+            }
+        }
+
+        stage('Push to DockerHub') {
+            steps {
+                sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                sh "docker push ${IMAGE_NAME}:latest"
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh "kubectl apply -f k8s/"
             }
         }
     }
