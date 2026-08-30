@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: todo-app
-        image: morafikhajar/todo-app:latest
+        image: morafikhajar/projet-devops-taches:latest
         env:
         - name: DATABASE_URL
           value: "postgresql://postgres:mysecretpassword@postgres-service:5432/tododb"
