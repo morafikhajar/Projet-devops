@@ -38,9 +38,9 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
+                stage('Deploy to Kubernetes') {
             steps {
-                sh "kubectl apply -f k8s/"
+                sh "sshpass -p 'vag123' ssh -o StrictHostKeyChecking=no vagrant@192.168.56.11 'cd /home/vagrant/projet-devops && git pull && kubectl apply -f k8s/'"
             }
         }
     }
