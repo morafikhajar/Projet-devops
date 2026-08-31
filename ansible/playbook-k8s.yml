@@ -51,3 +51,13 @@
         name: postgresql
         state: started
         enabled: true
+    - name: installer nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: demarrer et activer nginx
+      service:
+        name: nginx
+        state: started
+        enabled: true

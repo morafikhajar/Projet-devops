@@ -1,4 +1,4 @@
-﻿---
+---
 - hosts: all
   become: true
 
@@ -10,26 +10,45 @@
       loop:
         - /etc/apt/sources.list.d/jenkins.list
         - /etc/apt/sources.list.d/jenkins.list.save
+        - /usr/share/keyrings/jenkins-keyring.asc
 
-    - name: Importer la cle GPG Jenkins directement dans apt-key
-      apt_key:
-        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+    - name: Installer Docker
+      apt:
+        name: docker.io
         state: present
+
+    - name: Demarrer et activer Docker
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Ajouter vagrant au groupe docker
+      user:
+        name: vagrant
+        groups: docker
+        append: true
+
+    - name: Telecharger la cle GPG Jenkins
+      get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+        dest: /tmp/jenkins.key
+        force: yes
+
+    - name: Ajouter la cle GPG Jenkins avec apt-key
+      shell: apt-key add /tmp/jenkins.key
 
     - name: Ajouter le depot officiel Jenkins
-      apt_repository:
-        repo: "deb https://pkg.jenkins.io/debian-stable binary/"
-        state: present
-        filename: jenkins
+      shell: echo "deb https://pkg.jenkins.io/debian-stable binary/" > /etc/apt/sources.list.d/jenkins.list
 
     - name: Mettre a jour le cache apt
       apt:
         update_cache: yes
 
-    - name: Installer Java 17 et Git
+    - name: Installer Java 21 et Git
       apt:
         name:
-          - openjdk-17-jdk
+          - openjdk-21-jdk
           - git
         state: present
 
@@ -43,3 +62,14 @@
         name: jenkins
         state: started
         enabled: true
+
+    - name: Ajouter jenkins au groupe docker
+      user:
+        name: jenkins
+        groups: docker
+        append: true
+
+    - name: Redemarrer Jenkins pour prendre en compte le groupe docker
+      service:
+        name: jenkins
+        state: restarted
