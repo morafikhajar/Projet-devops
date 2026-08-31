@@ -1,4 +1,4 @@
-﻿apiVersion: apps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: todo-app
@@ -17,6 +17,8 @@ spec:
         image: morafikhajar/projet-devops-taches:latest
         env:
         - name: DATABASE_URL
-          value: "postgresql://postgres:mysecretpassword@postgres-service:5432/tododb"
+          value: "postgresql://postgres:DevOpsSecure2026@postgres-service:5432/tododb"
         ports:
         - containerPort: 5000
+
+

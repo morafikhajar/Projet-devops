@@ -7,7 +7,7 @@
 
     jenkins.vm.provider "virtualbox" do |vb|
       vb.name = "jenkins-server"
-      vb.memory = 2048
+      vb.memory = 1536
       vb.cpus = 2
     end
 
@@ -23,7 +23,7 @@
 
     k8s.vm.provider "virtualbox" do |vb|
       vb.name = "k8s-server"
-      vb.memory = 4096
+      vb.memory = 5120
       vb.cpus = 2
     end
 
